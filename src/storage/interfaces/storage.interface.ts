@@ -15,7 +15,6 @@ export interface StorageProvider {
     validateFileContent(uploadId: string, expectedMimeType: string): Promise<boolean>;
 }
 
-
 export interface StorageFileMetadata {
     id: string;
     originalName: string;

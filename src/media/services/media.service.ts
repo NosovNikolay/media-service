@@ -232,7 +232,6 @@ export class MediaService {
         const sortField = filter.sortBy || 'createdAt';
         const sortDirection = filter.sortOrder === 'asc' ? 1 : -1;
 
-        // Build filter query
         if (filter.status) {
             query.status = filter.status;
         }
@@ -269,11 +268,9 @@ export class MediaService {
             }
         }
 
-        // Count total items for pagination
         const totalItems = await this.mediaRepository.count(query);
         const totalPages = Math.ceil(totalItems / limit);
 
-        // Get items for the current page
         const options = {
             limit,
             skip,
@@ -282,7 +279,6 @@ export class MediaService {
 
         const mediaEntities = await this.mediaRepository.find(query, options);
 
-        // Generate DTOs and add URLs if requested
         const mediaDtos: FileMetadataDto[] = [];
         for (const entity of mediaEntities) {
             const dto = MediaMapper.toFileMetadataDto(entity);
@@ -314,26 +310,20 @@ export class MediaService {
     public async updateFile(fileId: string, request: UploadRequestDto): Promise<UploadResponseDto> {
         this.validateUploadRequest(request);
 
-        // Check if file exists
         const existingFile = await this.mediaRepository.findById(fileId);
         if (!existingFile) {
             throw new NotFoundError(`File with ID ${fileId} not found`);
         }
 
-        // Delete existing file from storage
         try {
             await this.storageProvider.deleteFile(fileId);
         } catch (error) {
             logger.error({ err: error, fileId }, 'Failed to delete existing file from storage');
-            // Continue anyway, as we want to replace the file
         }
 
-        // Create storage metadata for the new file
         const storageMetadata = StorageMapper.toStorageMetadata(request, fileId);
-
-        // Update metadata in the database
         const mediaEntity = MediaMapper.toMediaEntity(request, fileId);
-        mediaEntity.status = MediaStatusEnum.PENDING; // Reset to pending
+        mediaEntity.status = MediaStatusEnum.PENDING;
 
         await this.mediaRepository.save(mediaEntity);
 
