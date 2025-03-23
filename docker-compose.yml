@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - MONGODB_URI=mongodb://mongo:27017/media_service
+      - MONGODB_DB_NAME=media_service
+      - ALLOWED_MIME_TYPES=${ALLOWED_MIME_TYPES:-image/jpeg,image/png,image/gif,application/pdf,video/mp4}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    volumes:
+      - app-logs:/app/logs
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    command: --wiredTigerCacheSizeGB 1.5
+
+volumes:
+  mongo-data:
+  app-logs:
