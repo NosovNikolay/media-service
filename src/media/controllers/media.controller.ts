@@ -196,23 +196,22 @@ export class MediaController {
                 filter.maxSize = parseInt(maxSize, 10);
             }
 
-            // Add pagination parameters to filter
             if (pageStr) {
                 const parsedPage = parseInt(pageStr, 10);
                 if (!isNaN(parsedPage) && parsedPage > 0) {
                     filter.page = parsedPage;
                 }
             } else {
-                filter.page = 1; // Default to first page
+                filter.page = 1;
             }
 
             if (limitStr) {
                 const parsedLimit = parseInt(limitStr, 10);
                 if (!isNaN(parsedLimit) && parsedLimit > 0) {
-                    filter.limit = Math.min(parsedLimit, 100); // Cap at 100 items per page
+                    filter.limit = Math.min(parsedLimit, 100);
                 }
             } else {
-                filter.limit = 20; // Default limit
+                filter.limit = 20;
             }
 
             if (sortBy) {
@@ -222,7 +221,7 @@ export class MediaController {
             if (sortOrder && (sortOrder === 'asc' || sortOrder === 'desc')) {
                 filter.sortOrder = sortOrder;
             } else {
-                filter.sortOrder = 'desc'; // Default to descending order (newest first)
+                filter.sortOrder = 'desc';
             }
 
             logger.debug({ filter, includeUrls }, 'Searching files');
